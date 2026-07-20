@@ -1,4 +1,4 @@
-# dynamixel-fast-teensy
+# dynamixel-turbo
 
 **A tiny, zero-heap Dynamixel Protocol 2.0 master for Teensy, with Fast Sync Read and a rock-steady 2 kHz current-control loop.**
 
@@ -54,8 +54,8 @@ Teensy, no servos, and no Arduino toolchain to run them.
 `#include <tiny_dxl.h>`. You will need Teensyduino for Teensy 4.x.
 
 ```
-git clone https://github.com/molanocortes/dynamixel-fast-teensy \
-  ~/Documents/Arduino/libraries/dynamixel-fast-teensy
+git clone https://github.com/molanocortes/dynamixel-turbo \
+  ~/Documents/Arduino/libraries/dynamixel-turbo
 ```
 
 **Direct.** Drop `src/tiny_dxl.h` next to your sketch and `#include "tiny_dxl.h"`.
