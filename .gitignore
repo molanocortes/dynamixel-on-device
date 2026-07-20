@@ -1,0 +1,24 @@
+# Compiled host-test binaries + object files
+/test/test_codec
+/test/test_motor
+*.o
+*.obj
+*.out
+a.out
+*.exe
+
+# Arduino / Teensy build artifacts
+build/
+*.hex
+*.elf
+*.bin
+*.map
+*.lst
+
+# Editor / OS cruft
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
