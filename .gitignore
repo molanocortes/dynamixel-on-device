@@ -1,5 +1,8 @@
 # Compiled host-test binaries + object files
 /test/test_codec
+/test/test_codec_hwdir
+/test/test_codec_pinned
+/test/test_codec_pinhw
 /test/test_motor
 *.o
 *.obj

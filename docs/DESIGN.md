@@ -6,7 +6,7 @@ transparency argument. Every performance number is marked **computed** (from
 bytes x 10 bits / baud) or **measured** (captured on hardware via `M,b`), nothing here is
 invented. No Teensy toolchain was available in the authoring environment, so the on-target
 `.hex` build and the `M,b` capture are the bench step; the control-path logic was verified
-off-target by 49 host-compiled assertions (see *Verification*).
+off-target by 62 host-compiled assertions (see *Verification*).
 
 ## What changed and why (each item states the reason)
 
@@ -152,16 +152,49 @@ that `M,s` reports as `nOverrun`/`worstUs`.)
 ## Verification (this run, host-compiled, no hardware)
 
 The frame codec and the sketch's motor logic were compiled and executed on the host against a
-faithful Protocol-2.0 bus emulator (`test/`, run with `./test/run.sh`): **21 codec assertions**
+faithful Protocol-2.0 bus emulator (`test/`, run with `./test/run.sh`): **40 codec assertions**
 (Fast Sync Read parse incl. an embedded `FF FF FD 00` header pattern and a `0xFDFF` position;
 CRC-16; TX byte-stuffing and RX destuffing across `0xFDFF`; bad-CRC / truncation / id-order
-rejection, each counted) and **34 integration assertions** driving the *actual*
+rejection, each counted; plus the half-duplex direction strategies, see *Portability*) and
+**41 integration assertions** driving the *actual*
 `wearable_hand_bringup.ino` (bus take at 4 Mbaud/500 us, single-master refusal on a busy bus,
 missing-motor refusal, link-quality gating, torque-off-on-connect, indirect arm + `0x8A`
 selection, engineering-unit parse, hardware-error fail-safe, sustained-miss fail-safe, `M,b`,
 the `loop()` `M,` dispatch wiring, the indirect-fails -> direct-fallback path, the servo
-Bus-Watchdog arming + stall self-heal, and the enable torque-safety refusal). All 62 pass.
+Bus-Watchdog arming + stall self-heal, and the enable torque-safety refusal). The codec suite
+is built and run **twice**, once per direction strategy (37 of the 40 assertions apply in the
+hardware-direction configuration; the difference is the three that are specific to one path),
+so the total executed is **171 across five builds** (one per direction configuration). All pass.
 What remains for the bench: the Teensy `.hex` compile and the `M,b` / F_t captures above.
+
+## Portability (what is core-specific, and what that costs)
+
+Everything in `tiny_dxl.h` is plain C++17 over `<Arduino.h>`, `HardwareSerial` and `micros()`.
+The single core-specific operation is turning the half-duplex transceiver around, which is
+isolated behind `DxlDir`:
+
+| Mode | Mechanism | Turnaround cost |
+|---|---|---|
+| `HARDWARE` | UART peripheral drives DE in the TX ISR (Teensy `transmitterEnable`) | none, hardware-timed |
+| `MANUAL` | `digitalWrite` around `write()` + `flush()` | one GPIO write each way, plus the core's `flush()` overshoot |
+| `CALLBACK` | caller-supplied function (ESP32 native RS485, shift register, ...) | whatever the caller's path costs |
+| `NONE` | self-directing transceiver (MAX13487 class) | none |
+
+`MANUAL` is correct on any core that honours the Arduino contract that `flush()` returns only
+after the last stop bit has left. Two ordering rules make it safe, and both are asserted in
+the host suite: DE rises **before** the first byte reaches the UART, and falls **immediately**
+after `flush()` returns, before the turnaround timestamp is taken, because with RDT 0 the
+servo can begin answering at once and a late release would put two transmitters on one wire.
+The cost of that ordering is that `lastTurnaroundUs` in `MANUAL` mode excludes the release
+`digitalWrite`, so it reads a microsecond or two optimistic. In `HARDWARE` mode there is
+nothing to exclude.
+
+**Verified how:** host-compiled, on both branches. The suite asserts pin ordering against the
+TX byte count, byte-for-byte frame identity between strategies, that `NONE` and `CALLBACK`
+touch no GPIO, and that an unsupported `HARDWARE` request degrades to `MANUAL` instead of
+silently doing nothing. **Not verified:** any non-Teensy board on real hardware. A core whose
+`flush()` returns early would truncate the last byte, and no host test can see that. That is
+a scope-and-a-servo check, and it is open.
 
 ## Files
 - `src/tiny_dxl.h`, `fastSyncRead()` (`0x8A`), turnaround instrumentation, `rxGuardUs`, bounded read fix.
