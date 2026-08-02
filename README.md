@@ -1,11 +1,11 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/header-dark.svg">
+  <img alt="dynamixel-on-device: the Dynamixel control loop, on the microcontroller. C++17, single header, AGPL-3.0. A Protocol 2.0 instruction frame with the Fast Sync Read instruction byte 0x8A highlighted." src="docs/header-light.svg" width="100%">
+</picture>
+
 # dynamixel-on-device
 
 **Run the Dynamixel control loop on your microcontroller instead of a host PC. Protocol 2.0 with Fast Sync Read, over a 74HC241 half-duplex transceiver or equivalent. One header, no heap, testable on your laptop with no hardware.**
-
-![license](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)
-![platform](https://img.shields.io/badge/platform-Arduino%20cores-orange.svg)
-![language](https://img.shields.io/badge/C%2B%2B-17-blue.svg)
-![tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)
 
 `tiny_dxl` is a single-header C++ driver for driving ROBOTIS **Dynamixel X-series** servos
 from a microcontroller over a half-duplex bus. It is small, reentrant, and allocation-free,
