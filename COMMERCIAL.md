@@ -17,7 +17,7 @@ obligations for your product.
 
 ## How to obtain one
 
-Contact the author, **Juan Sebastian Molano**, through GitHub: open an issue on this
+Contact the author, **Sebastian Molano**, through GitHub: open an issue on this
 repository, or reach out via the profile [@molanocortes](https://github.com/molanocortes).
 
 The intent is simple. This work is for the community and free for the people who build in

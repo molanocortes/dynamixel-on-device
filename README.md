@@ -306,4 +306,4 @@ to keep their own work closed help fund it.
 
 ## Author
 
-Created by **Juan Sebastian Molano**. If it saves you time, a star is appreciated.
+Created by **Sebastian Molano**. If it saves you time, a star is appreciated.
